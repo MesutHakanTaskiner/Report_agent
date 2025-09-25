@@ -2,12 +2,8 @@
 import { Layout, Button, Typography, List, Card, Space, Input, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import {
-  ArrowLeftOutlined,
   PlusOutlined,
   FileOutlined,
-  QuestionCircleOutlined,
-  StarFilled,
-  StarOutlined,
   EditOutlined,
   DeleteOutlined,
   MoreOutlined
@@ -24,15 +20,12 @@ interface SessionSidebarProps {
   currentSessionId: string;
   editingSessionId: string | null;
   editingTitle: string;
-  onBackToDashboard: () => void;
   onNewAnalysis: () => void;
   onSessionClick: (sessionId: string) => void;
-  onToggleFavorite: (sessionId: string) => void;
   onDeleteSession: (sessionId: string) => void;
   onRenameSession: (sessionId: string, newTitle: string) => void;
   onStartEditingSession: (sessionId: string, currentTitle: string) => void;
   onEditingTitleChange: (value: string) => void;
-  onHelpClick: () => void;
 }
 
 const SessionSidebar: React.FC<SessionSidebarProps> = ({
@@ -41,23 +34,14 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
   currentSessionId,
   editingSessionId,
   editingTitle,
-  onBackToDashboard,
   onNewAnalysis,
   onSessionClick,
-  onToggleFavorite,
   onDeleteSession,
   onRenameSession,
   onStartEditingSession,
-  onEditingTitleChange,
-  onHelpClick
+  onEditingTitleChange
 }) => {
   const sessionMenuItems = (session: Session): MenuProps['items'] => [
-    {
-      key: 'favorite',
-      icon: session.isFavorite ? <StarFilled /> : <StarOutlined />,
-      label: session.isFavorite ? 'Remove from favorites' : 'Add to favorites',
-      onClick: () => onToggleFavorite(session.id)
-    },
     {
       key: 'rename',
       icon: <EditOutlined />,
@@ -82,9 +66,6 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
     >
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ padding: '16px 24px', borderBottom: '1px solid #e8e8e8' }}>
-          <Button icon={<ArrowLeftOutlined />} type="text" block style={{ textAlign: 'left', marginBottom: 16 }} onClick={onBackToDashboard}>
-            Back to Dashboard
-          </Button>
           <Button icon={<PlusOutlined />} type="primary" block size="large" onClick={onNewAnalysis}>
             New Analysis
           </Button>
@@ -127,7 +108,6 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
                           <Text strong style={{ display: 'block', marginBottom: 4 }}>
                             {session.title}
                           </Text>
-                          {session.isFavorite && <StarFilled style={{ color: '#faad14', fontSize: 12 }} />}
                         </Space>
                         <Text type="secondary" style={{ fontSize: 12 }}>
                           {new Date(session.timestamp).toLocaleDateString()}  -  {session.fileCount} files
@@ -151,11 +131,6 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
           />
         </div>
 
-        <div style={{ padding: '16px 24px', borderTop: '1px solid #e8e8e8' }}>
-          <Button icon={<QuestionCircleOutlined />} type="text" block style={{ textAlign: 'left' }} onClick={onHelpClick}>
-            Help & FAQ
-          </Button>
-        </div>
       </div>
     </Sider>
   );
