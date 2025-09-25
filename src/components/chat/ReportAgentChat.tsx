@@ -28,6 +28,7 @@ const ReportAgentChat: React.FC = () => {
     helpDrawerVisible,
     editingSessionId,
     editingTitle,
+    showWelcomeMessage,
     setInputValue,
     setSelectedModel,
     setCollapsed,
@@ -109,6 +110,30 @@ const ReportAgentChat: React.FC = () => {
             style={{ flex: 1, marginBottom: 16, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
             styles={{ body: { flex: 1, overflow: 'auto', padding: 16, backgroundColor: '#fafafa' } }}
           >
+            {showWelcomeMessage && messages.length === 0 && (
+              <div style={{ 
+                padding: '20px', 
+                background: '#f0f7ff', 
+                borderRadius: '8px', 
+                marginBottom: '16px',
+                border: '1px solid #d6e8ff'
+              }}>
+                <Text strong style={{ fontSize: '16px', display: 'block', marginBottom: '8px' }}>
+                  Welcome to Report Agent!
+                </Text>
+                <Text>
+                  I'm here to help you analyze your business data. To get started:
+                </Text>
+                <ul style={{ paddingLeft: '20px', margin: '8px 0' }}>
+                  <li>Upload your Excel, CSV, PDF, or VB reports using the upload area below</li>
+                  <li>Ask me specific questions about your data</li>
+                  <li>Try the quick action buttons for common analysis tasks</li>
+                </ul>
+                <Text type="secondary" style={{ fontSize: '13px', fontStyle: 'italic' }}>
+                  This message will disappear once you send your first message.
+                </Text>
+              </div>
+            )}
             <MessageList
               messages={messages}
               showUploadZone={showUploadZone}
@@ -149,6 +174,3 @@ const ReportAgentChat: React.FC = () => {
 };
 
 export default ReportAgentChat;
-
-
-

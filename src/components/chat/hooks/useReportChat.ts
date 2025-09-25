@@ -25,6 +25,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
   const [editingTitle, setEditingTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentAnalysisType, setCurrentAnalysisType] = useState<string>('summarize');
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
 
   // Fetch sessions on component mount
   useEffect(() => {
@@ -49,6 +50,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     const fetchMessages = async () => {
       if (currentSessionId === 'default') {
         setMessages([]);
+        setShowWelcomeMessage(true); // Show welcome message for default session
         return;
       }
 
@@ -56,6 +58,10 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
         setIsLoading(true);
         const fetchedMessages = await api.getMessages(currentSessionId);
         setMessages(fetchedMessages);
+        
+        // Show welcome message only if the session has no messages
+        setShowWelcomeMessage(fetchedMessages.length === 0);
+        
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -77,6 +83,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
       setUploadedFiles([]);
       setInputValue('');
       setShowUploadZone(true);
+      setShowWelcomeMessage(true); // Reset welcome message for new session
       setCurrentSessionId(newSession.id);
 
       messageApi.success('New analysis session created');
@@ -92,6 +99,9 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
       const sessionMessages = await api.getMessages(sessionId);
       
       setMessages(sessionMessages);
+      
+      // Show welcome message only if the session has no messages
+      setShowWelcomeMessage(sessionMessages.length === 0);
       
       const session = sessions.find(s => s.id === sessionId);
       if (session?.title) {
@@ -133,6 +143,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
           if (currentSessionId === sessionId) {
             setCurrentSessionId('default');
             setMessages([]);
+            setShowWelcomeMessage(true); // Show welcome message when returning to default session
           }
         } catch (error) {
           console.error('Error deleting session:', error);
@@ -184,6 +195,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
 
     setMessages(prev => [...prev, newMessage]);
     setInputValue('');
+    setShowWelcomeMessage(false); // Hide welcome message when user sends a message
 
     if (uploadedFiles.length > 0) {
       setShowUploadZone(false);
@@ -310,12 +322,14 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     editingSessionId,
     editingTitle,
     isLoading,
+    showWelcomeMessage,
     setInputValue,
     setSelectedModel,
     setCollapsed,
     setHelpDrawerVisible,
     setEditingSessionId,
     setEditingTitle,
+    setShowWelcomeMessage,
     handleNewAnalysis,
     handleSessionClick,
     handleBackToDashboard,
