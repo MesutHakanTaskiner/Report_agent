@@ -6,22 +6,13 @@ import type { HookAPI as ModalHookAPI } from 'antd/es/modal/useModal';
 import type { FileAttachment, Message, Session } from '../types';
 import api from '../../../services/api';
 
-const createInitialAssistantMessage = (): Message => ({
-  id: Date.now().toString(),
-  role: 'assistant',
-  content:
-    "Hello! I'm your Report Agent. Upload Excel files, CSV, PDF, or VB reports, and I'll provide comprehensive analysis, extract key insights, and suggest actionable next steps. How can I help you today?",
-  timestamp: new Date(),
-  status: 'sent'
-});
-
 interface UseReportChatDeps {
   messageApi: MessageInstance;
   modalApi: ModalHookAPI;
 }
 
 export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
-  const [messages, setMessages] = useState<Message[]>([createInitialAssistantMessage()]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<FileAttachment[]>([]);
   const [showUploadZone, setShowUploadZone] = useState(true);
@@ -57,18 +48,14 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
   useEffect(() => {
     const fetchMessages = async () => {
       if (currentSessionId === 'default') {
-        setMessages([createInitialAssistantMessage()]);
+        setMessages([]);
         return;
       }
 
       try {
         setIsLoading(true);
         const fetchedMessages = await api.getMessages(currentSessionId);
-        if (fetchedMessages.length > 0) {
-          setMessages(fetchedMessages);
-        } else {
-          setMessages([createInitialAssistantMessage()]);
-        }
+        setMessages(fetchedMessages);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -86,7 +73,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
       const newSession = await api.createSession(title);
       
       setSessions(prev => [newSession, ...prev]);
-      setMessages([createInitialAssistantMessage()]);
+      setMessages([]);
       setUploadedFiles([]);
       setInputValue('');
       setShowUploadZone(true);
@@ -104,19 +91,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
       setCurrentSessionId(sessionId);
       const sessionMessages = await api.getMessages(sessionId);
       
-      if (sessionMessages.length > 0) {
-        setMessages(sessionMessages);
-      } else {
-        setMessages([
-          {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: 'Session loaded. No previous messages found.',
-            timestamp: new Date(),
-            status: 'sent'
-          }
-        ]);
-      }
+      setMessages(sessionMessages);
       
       const session = sessions.find(s => s.id === sessionId);
       if (session?.title) {
@@ -157,7 +132,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
           
           if (currentSessionId === sessionId) {
             setCurrentSessionId('default');
-            setMessages([createInitialAssistantMessage()]);
+            setMessages([]);
           }
         } catch (error) {
           console.error('Error deleting session:', error);

@@ -22,7 +22,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, showUploadZone, upl
       <MessageItem key={msg.id} message={msg} />
     ))}
 
-    {showUploadZone && messages.length === 1 && (
+    {showUploadZone && messages.length === 0 && (
       <div style={{ marginTop: 16, marginBottom: 16 }}>
         <Dragger {...uploadProps} style={{ backgroundColor: '#fff' }}>
           <p className="ant-upload-drag-icon">
@@ -39,4 +39,3 @@ const MessageList: React.FC<MessageListProps> = ({ messages, showUploadZone, upl
 );
 
 export default MessageList;
-
