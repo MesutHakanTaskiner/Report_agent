@@ -5,6 +5,7 @@ import type { HookAPI as ModalHookAPI } from 'antd/es/modal/useModal';
 
 import type { FileAttachment, Message, Session } from '../types';
 import api from '../../../services/api';
+import { DeleteOutlined } from '@ant-design/icons';
 
 interface UseReportChatDeps {
   messageApi: MessageInstance;
@@ -45,7 +46,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
 
   const handleNewAnalysis = useCallback(async () => {
     try {
-      const title = `New Analysis ${new Date().toLocaleString()}`;
+      const title = `New Analysis`;
       const newSession = await api.createSession(title);
       
       setSessions(prev => [newSession, ...prev]);
@@ -108,6 +109,28 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     });
   }, [modalApi, messageApi, currentSessionId]);
 
+  const handleDeleteAllSessions = useCallback(() => {
+    modalApi.confirm({
+      title: 'Delete All Sessions',
+      content: 'Are you sure you want to delete all sessions? This action cannot be undone.',
+      okText: 'Delete All',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await api.deleteAllSessions();
+          setSessions([]);
+          setCurrentSessionId('default');
+          setMessages([]);
+          setShowWelcomeMessage(true);
+          messageApi.success('All sessions deleted');
+        } catch (error) {
+          console.error('Error deleting all sessions:', error);
+          messageApi.error('Failed to delete all sessions');
+        }
+      }
+    });
+  }, [modalApi, messageApi]);
+
   const handleRenameSession = useCallback(async (sessionId: string, newTitle: string) => {
     try {
       const updatedSession = await api.updateSession(sessionId, newTitle);
@@ -155,7 +178,12 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     let sessionId = currentSessionId;
     if (sessionId === 'default') {
       try {
-        const newSession = await api.createSession(`New Analysis ${new Date().toLocaleString()}`);
+        // Create a title based on the user's question
+        const title = inputValue.length > 30 
+          ? `${inputValue.substring(0, 30)}...` 
+          : inputValue;
+        
+        const newSession = await api.createSession(title);
         setSessions(prev => [newSession, ...prev]);
         sessionId = newSession.id;
         setCurrentSessionId(sessionId);
@@ -237,12 +265,15 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     }
 
     const actionMessages: Record<string, string> = {
-      summarize: 'Please provide a comprehensive summary of the uploaded reports.',
-      trends: 'Analyze and identify key trends in the data.',
-      kpis: 'Extract and highlight the key performance indicators.',
-      actions: 'Generate actionable recommendations based on the analysis.',
-      compare: 'Compare the uploaded reports and highlight differences.'
+      summarize:
+        "Read the uploaded file(s) and produce an executive summary: 5–8 bullet takeaways, a ≤150-word narrative, and 3–5 next steps. Quote key numbers with units/dates and flag any data-quality caveats.",
+      trends:
+        "Analyze the data for trends over time: direction, rate of change, seasonality, and anomalies. Report WoW/MoM/YoY deltas with %Δ, time windows, and confidence. Note likely drivers/risks and propose 2–3 testable hypotheses.",
+      kpis:
+        "Extract and normalize the most relevant KPIs. For each: name, definition/formula, unit & granularity, current value (with date), prior value(s) with %Δ, source/path, and data-quality notes. Include a KPI dictionary table.",
+    
     };
+
 
     const msg = actionMessages[action] || 'Processing your request...';
     setInputValue(msg);
@@ -312,6 +343,7 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     handleNewAnalysis,
     handleSessionClick,
     handleDeleteSession,
+    handleDeleteAllSessions,
     handleRenameSession,
     handleSend,
     handleAction,
