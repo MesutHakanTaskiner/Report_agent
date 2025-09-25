@@ -4,8 +4,9 @@ import { RobotOutlined, UserOutlined } from '@ant-design/icons';
 
 import type { Message } from '../types';
 import FileBadge from './FileBadge';
+import { formatMessageText } from '../utils';
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 interface MessageItemProps {
   message: Message;
@@ -19,7 +20,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
       <Space align="start" style={{ maxWidth: '70%' }}>
         {!isUser && <Avatar icon={<RobotOutlined />} style={{ backgroundColor: '#1890ff' }} />}
         <Card style={{ backgroundColor: isUser ? '#e6f7ff' : '#f0f2f5', border: 'none' }} styles={{ body: { padding: '8px 16px' } }}>
-          <Text>{message.content}</Text>
+          <Paragraph className="message-content" style={{ margin: 0 }}>
+            {formatMessageText(message.content)}
+          </Paragraph>
           {message.isStreaming && (
             <span className="typing-indicator" style={{ marginLeft: 4 }}>
               <span>.</span>
@@ -47,4 +50,3 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
 };
 
 export default MessageItem;
-
