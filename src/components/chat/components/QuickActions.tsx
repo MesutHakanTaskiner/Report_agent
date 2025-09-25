@@ -4,9 +4,7 @@ import {
   UploadOutlined,
   FileSearchOutlined,
   LineChartOutlined,
-  BarChartOutlined,
-  EditOutlined,
-  SwapOutlined
+  BarChartOutlined
 } from '@ant-design/icons';
 
 interface QuickActionsProps {
@@ -20,9 +18,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onAction, disabled, showUpl
     { key: 'upload', label: showUploadZone ? 'Hide Upload' : 'Upload Report', icon: <UploadOutlined /> },
     { key: 'summarize', label: 'Summarize', icon: <FileSearchOutlined /> },
     { key: 'trends', label: 'Analyze Trends', icon: <LineChartOutlined /> },
-    { key: 'kpis', label: 'Extract KPIs', icon: <BarChartOutlined /> },
-    { key: 'actions', label: 'Action Items', icon: <EditOutlined /> },
-    { key: 'compare', label: 'Compare', icon: <SwapOutlined /> }
+    { key: 'kpis', label: 'Extract KPIs', icon: <BarChartOutlined /> }
   ];
 
   return (
