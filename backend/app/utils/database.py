@@ -1,27 +1,56 @@
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session as SQLAlchemySession
 from datetime import datetime
+from typing import Generator
 import uuid
-from typing import Dict, List
 
-from app.models.schemas import Message, Session, FileAttachment
+from app.models.database import Base, Session, Message, FileAttachment
 
-# In-memory database
-sessions_db: Dict[str, Session] = {}
-messages_db: Dict[str, List[Message]] = {}
-files_db: Dict[str, FileAttachment] = {}
+# Get database URL from environment variable or use SQLite as default
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./report_agent.db")
 
-# Initialize with empty data structures
-def init_db():
-    # Create a default session with no messages
-    default_session_id = "default"
-    default_session = Session(
-        id=default_session_id,
-        title="New Analysis",
-        timestamp=datetime.now(),
-        fileCount=0
-    )
+# Create SQLAlchemy engine
+engine = create_engine(DATABASE_URL)
+
+# Create sessionmaker
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Dependency to get DB session
+def get_db() -> Generator[SQLAlchemySession, None, None]:
+    """
+    Get a database session.
     
-    sessions_db[default_session_id] = default_session
-    messages_db[default_session_id] = []  # Empty messages list
+    Yields:
+        SQLAlchemy Session: A database session
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-# Initialize the database
-init_db()
+# Initialize database
+def init_db():
+    """
+    Initialize the database by creating all tables and a default session if none exists.
+    """
+    # Create tables
+    Base.metadata.create_all(bind=engine)
+    
+    # Create a default session if none exists
+    db = SessionLocal()
+    try:
+        # Check if any sessions exist
+        session_count = db.query(Session).count()
+        if session_count == 0:
+            # Create a default session
+            default_session = Session.create_new(title="New Analysis")
+            db.add(default_session)
+            db.commit()
+    except Exception as e:
+        db.rollback()
+        print(f"Error initializing database: {e}")
+    finally:
+        db.close()
