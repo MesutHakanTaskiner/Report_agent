@@ -19,6 +19,42 @@ This is a full-stack application for analyzing business reports and documents. I
     - `services/` - Business logic
     - `utils/` - Utility functions
 
+## Identified Shortcomings
+
+### Documentation
+- Missing detailed API documentation with request/response examples
+- No troubleshooting guide or common issues section
+- No explanation of the analysis types (summarize, trends, kpis, actions, compare)
+- Missing information about file size limits and supported formats
+- No deployment instructions for production environments
+- No information about potential dependency conflicts and their resolution
+
+### Known Issues
+- There may be compatibility issues between numpy and pandas versions, resulting in errors like:
+  ```
+  ValueError: numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject
+  ```
+  This can be resolved by reinstalling these packages in the correct order:
+  ```
+  pip uninstall -y numpy pandas
+  pip install numpy==1.24.3
+  pip install pandas==2.1.1
+  ```
+
+### Environment Setup
+- No clear instructions for setting up the OpenAI API key
+- Missing database configuration options (currently defaults to SQLite)
+- No information about required Python and Node.js versions
+- No Docker configuration for containerized deployment
+- Missing CORS configuration for production environments
+
+### Code Structure
+- Error handling could be improved with more specific error messages
+- No logging configuration for production environments
+- No unit or integration tests
+- No database migration scripts for schema changes
+- No authentication/authorization mechanism for API endpoints
+
 ## Getting Started
 
 ### Prerequisites
@@ -34,9 +70,19 @@ This is a full-stack application for analyzing business reports and documents. I
    ```
    npm install
    ```
-3. Install backend dependencies:
+3. Set up Python virtual environment (recommended):
    ```
    cd backend
+   python -m venv venv
+   
+   # On Windows
+   venv\Scripts\activate
+   
+   # On macOS/Linux
+   source venv/bin/activate
+   ```
+4. Install backend dependencies:
+   ```
    pip install -r requirements.txt
    ```
 
@@ -48,11 +94,23 @@ You can run both the frontend and backend with a single command:
 start.bat
 ```
 
+The start.bat script will:
+1. Check if a Python virtual environment exists in the backend folder
+2. Create one if it doesn't exist
+3. Activate the virtual environment
+4. Install the required Python dependencies
+5. Start the backend server in the virtual environment
+6. Start the frontend development server
+
 Or run them separately:
 
 **Backend:**
 ```
 cd backend
+python -m venv venv           # Create virtual environment (first time only)
+venv\Scripts\activate         # On Windows
+source venv/bin/activate      # On macOS/Linux
+pip install -r requirements.txt
 python run.py
 ```
 
@@ -95,3 +153,61 @@ npm run dev
 - Python
 - FastAPI
 - Uvicorn
+
+## Environment Details
+
+### Backend Environment
+- The application uses OpenAI API for generating responses
+- Requires an OpenAI API key to be set in the `.env` file (copy from `.env.example`)
+- Default model is set to `gpt-4o` with fallbacks to other models if unavailable
+- Uses SQLite as the default database (stored in `report_agent.db`)
+- File uploads are stored in a local `uploads` directory
+- Supports analysis of Excel, CSV, PDF, and text files
+- Python virtual environment (venv) is recommended but not enforced
+- No requirements pinning or dependency management beyond basic requirements.txt
+- No environment-specific configuration for development vs. production
+
+### Frontend Environment
+- Built with React 19 and TypeScript
+- Uses Ant Design for UI components
+- Communicates with backend via Axios HTTP client
+- Runs on Vite development server
+- Configured for modern browsers with ESLint for code quality
+
+## Additional Findings
+
+### Security Considerations
+- CORS is currently configured to allow all origins (`*`), which is not secure for production
+- No authentication or authorization mechanisms are implemented
+- API endpoints are not rate-limited or protected against abuse
+- File uploads should have additional validation and virus scanning
+
+### Performance Considerations
+- Large file analysis may cause timeouts or excessive token usage
+- No caching mechanisms for API responses
+- No pagination for large datasets (sessions, messages)
+- No background job processing for long-running tasks
+
+### Scalability Considerations
+- SQLite database is not suitable for high-concurrency production environments
+- No load balancing or horizontal scaling configuration
+- File storage is local, not using cloud storage services
+- No database connection pooling or optimization
+
+### Recommended Improvements
+- Implement user authentication and authorization
+- Add comprehensive logging and monitoring
+- Create Docker configuration for easier deployment
+- Add unit and integration tests
+- Implement database migrations for schema changes
+- Configure proper CORS for production
+- Add pagination for API endpoints
+- Implement caching for frequently accessed data
+- Move file storage to cloud services (S3, Azure Blob, etc.)
+- Add request validation and rate limiting
+- Improve Python environment management:
+  - Add proper dependency pinning with version constraints
+  - Include a `pyproject.toml` for modern Python packaging
+  - Create separate requirements files for development and production
+  - Add a script to automatically set up the virtual environment
+  - Document virtualenv activation in the start.bat script
