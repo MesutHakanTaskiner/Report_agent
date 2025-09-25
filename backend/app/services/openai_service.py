@@ -142,6 +142,92 @@ def extract_file_content(file_path: str) -> str:
             # If not a text file, return a message
             return f"File format {file_extension} is not supported for direct text extraction."
 
+async def generate_conversation_response(conversation_history: List[Dict[str, str]], user_message: str) -> str:
+    """
+    Generate a response to a user message based on conversation history
+    
+    Args:
+        conversation_history: List of previous messages in the conversation
+        user_message: The current user message to respond to
+        
+    Returns:
+        Assistant's response as a string
+    """
+    # Check if OpenAI API key is set
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key or api_key == "your_openai_api_key_here":
+        return "OpenAI API key is not configured. Please set your API key in the .env file."
+    
+    try:
+        # Check if OpenAI client is initialized
+        if not client:
+            return "Error: OpenAI client not initialized. Please check your API key."
+        
+        # Prepare messages for the API call
+        messages = [
+            {"role": "system", "content": "You are an expert business analyst assistant that provides helpful, detailed, and accurate responses to user questions. You can analyze business data, provide insights, and answer general questions."}
+        ]
+        
+        # Add conversation history (limited to last 10 messages to avoid token limits)
+        for msg in conversation_history[-10:]:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        # Add the current user message
+        messages.append({"role": "user", "content": user_message})
+        
+        # Try with the specified model first
+        current_model = model_name
+        print(f"Sending request to OpenAI API with model: {current_model}")
+        
+        try:
+            # Call OpenAI API
+            response = client.chat.completions.create(
+                model=current_model,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=1000
+            )
+        except Exception as model_error:
+            # If the specified model fails, try fallback models
+            print(f"Error with model {current_model}: {str(model_error)}")
+            
+            for fallback_model in FALLBACK_MODELS:
+                if fallback_model != current_model:
+                    try:
+                        print(f"Trying fallback model: {fallback_model}")
+                        response = client.chat.completions.create(
+                            model=fallback_model,
+                            messages=messages,
+                            temperature=0.7,
+                            max_tokens=1000
+                        )
+                        print(f"Successfully used fallback model: {fallback_model}")
+                        break
+                    except Exception as fallback_error:
+                        print(f"Error with fallback model {fallback_model}: {str(fallback_error)}")
+                        continue
+            else:
+                # If all models fail, raise the original error
+                raise model_error
+        
+        # Return the response
+        result = response.choices[0].message.content
+        print(f"Received response from OpenAI API: {len(result)} characters")
+        return result
+    except Exception as e:
+        error_message = str(e)
+        print(f"Error calling OpenAI API: {error_message}")
+        
+        # Check for common errors
+        if "API key" in error_message:
+            return "Error: Invalid OpenAI API key. Please check your API key in the .env file."
+        elif "model" in error_message:
+            return f"Error: The model '{model_name}' is not available. Please check your OPENAI_MODEL setting in the .env file."
+        elif "too many tokens" in error_message or "maximum context length" in error_message:
+            return "Error: The conversation is too long for the AI model to process. Some context may be lost."
+        else:
+            return f"Error generating response: {error_message}"
+
 async def analyze_files(file_paths: List[str], analysis_type: str = "summarize", user_message: str = "") -> str:
     """
     Analyze files using OpenAI API
