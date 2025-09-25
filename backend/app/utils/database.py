@@ -9,18 +9,9 @@ sessions_db: Dict[str, Session] = {}
 messages_db: Dict[str, List[Message]] = {}
 files_db: Dict[str, FileAttachment] = {}
 
-# Initialize with minimal data
+# Initialize with empty data structures
 def init_db():
-    # Create initial assistant message
-    initial_message = Message(
-        id=str(uuid.uuid4()),
-        role="assistant",
-        content="Hello! I'm your Report Agent. Upload Excel files, CSV, PDF, or VB reports, and I'll provide comprehensive analysis, extract key insights, and suggest actionable next steps. How can I help you today?",
-        timestamp=datetime.now(),
-        status="sent"
-    )
-    
-    # Create a default session with just the initial message
+    # Create a default session with no messages
     default_session_id = "default"
     default_session = Session(
         id=default_session_id,
@@ -30,7 +21,7 @@ def init_db():
     )
     
     sessions_db[default_session_id] = default_session
-    messages_db[default_session_id] = [initial_message]
+    messages_db[default_session_id] = []  # Empty messages list
 
 # Initialize the database
 init_db()
