@@ -22,3 +22,25 @@ export const getFileIcon = (fileName: string): React.ReactNode => {
       return <FileTextOutlined style={{ fontSize: 20, color: '#1890ff' }} />;
   }
 };
+
+/**
+ * Format message text to preserve line breaks and spacing
+ * This is a simple approach that doesn't require additional libraries
+ */
+export const formatMessageText = (text: string): React.ReactNode => {
+  if (!text) return null;
+  
+  // Split by line breaks and create an array of elements
+  const lines = text.split('\n');
+  
+  return (
+    <>
+      {lines.map((line, i) => (
+        <React.Fragment key={i}>
+          {line}
+          {i < lines.length - 1 && <br />}
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
