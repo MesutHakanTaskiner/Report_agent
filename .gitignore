@@ -27,4 +27,4 @@ dist-ssr
 **/uploads
 
 .env
-.db
+*.db
