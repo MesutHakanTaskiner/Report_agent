@@ -35,6 +35,10 @@ export const deleteSession = async (sessionId: string): Promise<void> => {
   await api.delete(`/sessions/${sessionId}`);
 };
 
+export const deleteAllSessions = async (): Promise<void> => {
+  await api.delete('/sessions');
+};
+
 export const toggleFavorite = async (sessionId: string): Promise<Session> => {
   const response = await api.put(`/sessions/${sessionId}/favorite`);
   return response.data;
@@ -85,6 +89,7 @@ export default {
   createSession,
   updateSession,
   deleteSession,
+  deleteAllSessions,
   toggleFavorite,
   getMessages,
   sendMessage,
