@@ -6,7 +6,8 @@ import {
   FileOutlined,
   EditOutlined,
   DeleteOutlined,
-  MoreOutlined
+  MoreOutlined,
+  ClearOutlined
 } from '@ant-design/icons';
 
 import type { Session } from '../types';
@@ -23,6 +24,7 @@ interface SessionSidebarProps {
   onNewAnalysis: () => void;
   onSessionClick: (sessionId: string) => void;
   onDeleteSession: (sessionId: string) => void;
+  onDeleteAllSessions: () => void;
   onRenameSession: (sessionId: string, newTitle: string) => void;
   onStartEditingSession: (sessionId: string, currentTitle: string) => void;
   onEditingTitleChange: (value: string) => void;
@@ -37,6 +39,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
   onNewAnalysis,
   onSessionClick,
   onDeleteSession,
+  onDeleteAllSessions,
   onRenameSession,
   onStartEditingSession,
   onEditingTitleChange
@@ -72,10 +75,24 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
         </div>
 
         <div style={{ flex: 1, overflow: 'auto', padding: '16px 24px' }}>
-          <Title level={5} style={{ marginBottom: 16, color: '#666' }}>
-            <FileOutlined style={{ marginRight: 8 }} />
-            Recent Analyses
-          </Title>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <Title level={5} style={{ margin: 0, color: '#666' }}>
+              <FileOutlined style={{ marginRight: 8 }} />
+              Recent Analyses
+            </Title>
+            {sessions.length > 0 && (
+              <Button 
+                type="text" 
+                danger 
+                icon={<ClearOutlined />} 
+                size="small"
+                onClick={onDeleteAllSessions}
+                title="Delete all sessions"
+              >
+                Clear All
+              </Button>
+            )}
+          </div>
           <List
             dataSource={sessions}
             renderItem={session => (
