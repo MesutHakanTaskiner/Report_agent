@@ -7,7 +7,7 @@ import asyncio
 
 from app.models.schemas import Message, MessageCreate, FileAttachment
 from app.utils.database import messages_db, sessions_db, files_db
-from app.services.openai_service import analyze_files
+from app.services.openai_service import analyze_files, generate_conversation_response
 
 router = APIRouter()
 
@@ -107,6 +107,16 @@ async def create_assistant_response(session_id: str, user_message: str, analysis
             else:
                 print(f"Warning: File with ID {file_id} not found in database")
     
+    # Prepare conversation history for context
+    conversation_history = []
+    # Get previous messages from this session (limited to last 10 to avoid token limits)
+    previous_messages = messages_db[session_id][:-1]  # Exclude the thinking message we just added
+    for msg in previous_messages[-10:]:
+        conversation_history.append({
+            "role": msg.role,
+            "content": msg.content
+        })
+    
     # Generate response based on files and analysis type
     if file_paths:
         # Use OpenAI to analyze files
@@ -116,8 +126,11 @@ async def create_assistant_response(session_id: str, user_message: str, analysis
             user_message=user_message
         )
     else:
-        # No files to analyze, provide a generic response
-        response_content = "I've received your message. To provide a detailed analysis, please upload some files (Excel, CSV, PDF) that you'd like me to analyze."
+        # No files to analyze, use conversation-based response
+        response_content = await generate_conversation_response(
+            conversation_history=conversation_history,
+            user_message=user_message
+        )
     
     # Update the thinking message with the actual response
     for i, msg in enumerate(messages_db[session_id]):
