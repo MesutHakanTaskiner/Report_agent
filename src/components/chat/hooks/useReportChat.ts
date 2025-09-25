@@ -16,11 +16,9 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
   const [inputValue, setInputValue] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<FileAttachment[]>([]);
   const [showUploadZone, setShowUploadZone] = useState(true);
-  const [selectedModel, setSelectedModel] = useState('GPT-4o');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>('default');
   const [collapsed, setCollapsed] = useState(false);
-  const [helpDrawerVisible, setHelpDrawerVisible] = useState(false);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,34 +42,6 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
 
     fetchSessions();
   }, [messageApi]);
-
-  // Fetch messages for current session
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (currentSessionId === 'default') {
-        setMessages([]);
-        setShowWelcomeMessage(true); // Show welcome message for default session
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        const fetchedMessages = await api.getMessages(currentSessionId);
-        setMessages(fetchedMessages);
-        
-        // Show welcome message only if the session has no messages
-        setShowWelcomeMessage(fetchedMessages.length === 0);
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-        messageApi.error('Failed to load messages');
-        setIsLoading(false);
-      }
-    };
-
-    fetchMessages();
-  }, [currentSessionId, messageApi]);
 
   const handleNewAnalysis = useCallback(async () => {
     try {
@@ -115,21 +85,6 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     }
   }, [sessions, messageApi]);
 
-  const handleBackToDashboard = () => {
-    messageApi.info('Navigating to dashboard...');
-  };
-
-  const handleToggleFavorite = useCallback(async (sessionId: string) => {
-    try {
-      const updatedSession = await api.toggleFavorite(sessionId);
-      setSessions(prev => prev.map(s => (s.id === sessionId ? updatedSession : s)));
-      messageApi.success(updatedSession.isFavorite ? 'Added to favorites' : 'Removed from favorites');
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      messageApi.error('Failed to update favorite status');
-    }
-  }, [messageApi]);
-
   const handleDeleteSession = useCallback((sessionId: string) => {
     modalApi.confirm({
       title: 'Delete Session',
@@ -164,6 +119,34 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
       messageApi.error('Failed to rename session');
     }
   }, [messageApi]);
+  // Fetch messages for current session
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (currentSessionId === 'default') {
+        setMessages([]);
+        setShowWelcomeMessage(true); // Show welcome message for default session
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const fetchedMessages = await api.getMessages(currentSessionId);
+        setMessages(fetchedMessages);
+        
+        // Show welcome message only if the session has no messages
+        setShowWelcomeMessage(fetchedMessages.length === 0);
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+        messageApi.error('Failed to load messages');
+        setIsLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, [currentSessionId, messageApi]);
+
 
   const handleSend = useCallback(async () => {
     if (!inputValue.trim() && uploadedFiles.length === 0) return;
@@ -314,26 +297,20 @@ export const useReportChat = ({ messageApi, modalApi }: UseReportChatDeps) => {
     inputValue,
     uploadedFiles,
     showUploadZone,
-    selectedModel,
     sessions,
     currentSessionId,
     collapsed,
-    helpDrawerVisible,
     editingSessionId,
     editingTitle,
     isLoading,
     showWelcomeMessage,
     setInputValue,
-    setSelectedModel,
     setCollapsed,
-    setHelpDrawerVisible,
     setEditingSessionId,
     setEditingTitle,
     setShowWelcomeMessage,
     handleNewAnalysis,
     handleSessionClick,
-    handleBackToDashboard,
-    handleToggleFavorite,
     handleDeleteSession,
     handleRenameSession,
     handleSend,
