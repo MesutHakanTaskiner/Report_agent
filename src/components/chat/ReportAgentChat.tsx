@@ -33,6 +33,7 @@ const ReportAgentChat: React.FC = () => {
     handleNewAnalysis,
     handleSessionClick,
     handleDeleteSession,
+    handleDeleteAllSessions,
     handleRenameSession,
     handleSend,
     handleAction,
@@ -61,6 +62,7 @@ const ReportAgentChat: React.FC = () => {
         onNewAnalysis={handleNewAnalysis}
         onSessionClick={handleSessionClick}
         onDeleteSession={handleDeleteSession}
+        onDeleteAllSessions={handleDeleteAllSessions}
         onRenameSession={handleRenameSession}
         onStartEditingSession={(sessionId, currentTitle) => {
           setEditingSessionId(sessionId);
