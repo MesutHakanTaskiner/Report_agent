@@ -7,7 +7,6 @@ import UploadedFilesList from './components/UploadedFilesList';
 import MessageComposer from './components/MessageComposer';
 import SessionSidebar from './components/SessionSidebar';
 import ChatHeader from './components/ChatHeader';
-import HelpDrawer from './components/HelpDrawer';
 import { useReportChat } from './hooks/useReportChat';
 
 const { Content } = Layout;
@@ -21,24 +20,18 @@ const ReportAgentChat: React.FC = () => {
     inputValue,
     uploadedFiles,
     showUploadZone,
-    selectedModel,
+    showWelcomeMessage,
     sessions,
     currentSessionId,
     collapsed,
-    helpDrawerVisible,
     editingSessionId,
     editingTitle,
-    showWelcomeMessage,
     setInputValue,
-    setSelectedModel,
     setCollapsed,
-    setHelpDrawerVisible,
     setEditingSessionId,
     setEditingTitle,
     handleNewAnalysis,
     handleSessionClick,
-    handleBackToDashboard,
-    handleToggleFavorite,
     handleDeleteSession,
     handleRenameSession,
     handleSend,
@@ -65,10 +58,8 @@ const ReportAgentChat: React.FC = () => {
         currentSessionId={currentSessionId}
         editingSessionId={editingSessionId}
         editingTitle={editingTitle}
-        onBackToDashboard={handleBackToDashboard}
         onNewAnalysis={handleNewAnalysis}
         onSessionClick={handleSessionClick}
-        onToggleFavorite={handleToggleFavorite}
         onDeleteSession={handleDeleteSession}
         onRenameSession={handleRenameSession}
         onStartEditingSession={(sessionId, currentTitle) => {
@@ -76,17 +67,12 @@ const ReportAgentChat: React.FC = () => {
           setEditingTitle(currentTitle);
         }}
         onEditingTitleChange={value => setEditingTitle(value)}
-        onHelpClick={() => setHelpDrawerVisible(true)}
       />
 
       <Layout style={{ backgroundColor: '#fff' }}>
         <ChatHeader
           collapsed={collapsed}
           onToggleSidebar={() => setCollapsed(prev => !prev)}
-          selectedModel={selectedModel}
-          onModelChange={setSelectedModel}
-          messageApi={message}
-          modalApi={modal}
         />
 
         <Content
@@ -167,8 +153,6 @@ const ReportAgentChat: React.FC = () => {
           />
         </Content>
       </Layout>
-
-      <HelpDrawer visible={helpDrawerVisible} onClose={() => setHelpDrawerVisible(false)} />
     </Layout>
   );
 };
