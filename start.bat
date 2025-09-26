@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 echo ===== Report Agent Setup and Startup =====
 echo.
 
@@ -18,8 +19,31 @@ cd backend
 IF EXIST venv (
     echo Virtual environment found.
 ) ELSE (
-    echo Creating Python virtual environment...
-    python -m venv venv
+    echo Checking for Python 3.11...
+    where python | findstr "3.11" > nul
+    if %errorlevel% equ 0 (
+        echo Python 3.11 found.
+        for /f "tokens=*" %%i in ('where python ^| findstr "3.11"') do set PY311=%%i
+        echo Using Python 3.11: !PY311!
+        "!PY311!" -m venv venv
+    ) else (
+        echo Python 3.11 not found, checking for py launcher...
+        where py > nul 2>&1
+        if %errorlevel% equ 0 (
+            echo Py launcher found, trying to use Python 3.11...
+            py -3.11 --version > nul 2>&1
+            if %errorlevel% equ 0 (
+                echo Python 3.11 found via py launcher.
+                py -3.11 -m venv venv
+            ) else (
+                echo Python 3.11 not found via py launcher, using default Python.
+                python -m venv venv
+            )
+        ) else (
+            echo Py launcher not found, using default Python.
+            python -m venv venv
+        )
+    )
     echo Virtual environment created.
 
     echo Activating virtual environment...
@@ -27,9 +51,17 @@ IF EXIST venv (
 
     echo Installing Python dependencies...
     pip install -r requirements.txt
+    
+    echo Fixing numpy/pandas compatibility issue...
+    pip uninstall -y numpy pandas
+    pip install numpy==1.24.3
+    pip install pandas==2.1.1
+    echo Fixed numpy/pandas compatibility issue.
 )
 
 echo Virtual environment is ready.
+
+call venv\Scripts\activate
 
 echo Starting backend server...
 start cmd /k "call venv\Scripts\activate && python run.py"
