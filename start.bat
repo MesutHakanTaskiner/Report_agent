@@ -64,7 +64,7 @@ echo Virtual environment is ready.
 call venv\Scripts\activate
 
 echo Starting backend server...
-start cmd /k "call venv\Scripts\activate && python run.py"
+start cmd /k "cd %CD% && call venv\Scripts\activate && python run.py"
 cd ..
 
 echo Starting frontend server...
