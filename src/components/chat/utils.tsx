@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { FileExcelOutlined, FilePdfOutlined, FileTextOutlined } from '@ant-design/icons';
 
 export const formatFileSize = (bytes: number): string => {
