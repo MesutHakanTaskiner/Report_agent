@@ -8,18 +8,13 @@ IF EXIST venv (
     echo Creating Python virtual environment...
     python -m venv venv
     echo Virtual environment created.
+
+    echo Installing Python dependencies...
+    pip install -r requirements.txt
 )
 
 echo Activating virtual environment...
 call venv\Scripts\activate
-
-echo Installing Python dependencies...
-pip install -r requirements.txt
-
-echo Fixing potential numpy/pandas compatibility issues...
-pip uninstall -y numpy pandas
-pip install numpy==1.24.3
-pip install pandas==2.1.1
 
 echo Starting backend server...
 start cmd /k "call venv\Scripts\activate && python run.py"
