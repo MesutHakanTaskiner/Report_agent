@@ -36,13 +36,18 @@ if exist "%VENV_PY%" (
     echo Virtual environment found.
 ) else (
     echo Creating virtual environment...
-    call :FIND_PY311 PY_CMD
-    if not defined PY_CMD (
-        echo [WARN] Could not find Python 3.11 explicitly. Falling back to default 'python'.
-        set "PY_CMD=python"
+    set "PY_CMD=python"
+    %PY_CMD% --version >nul 2>&1
+    if errorlevel 1 (
+        set "PY_CMD=py"
+        %PY_CMD% --version >nul 2>&1
+    )
+    if errorlevel 1 (
+        echo [ERROR] Could not find Python interpreter in PATH. Install Python 3 and re-run.
+        exit /b 1
     )
     pushd "%BACKEND%"
-    "%PY_CMD%" -m venv "venv"
+    call %PY_CMD% -m venv "venv"
     if errorlevel 1 (
         echo [ERROR] Failed to create virtual environment. Aborting.
         popd
@@ -62,7 +67,7 @@ if not exist "%VENV_PY%" (
     exit /b 1
 )
 pushd "%BACKEND%"
-"%VENV_PY%" -m pip --upgrade pip
+"%VENV_PY%" -m pip install --upgrade pip
 "%VENV_PY%" -m pip install -r requirements.txt
 if errorlevel 1 (
     echo [WARN] requirements install reported issues; continuing to numpy/pandas pin.
@@ -79,16 +84,16 @@ popd
 echo Fixed numpy/pandas compatibility issue.
 echo.
 
-REM === Start backend using the venv’s python directly (no activation) ===
+REM === Start backend using the venv's python directly (no activation) ===
 echo Starting backend server...
-start "" cmd /k ""%VENV_PY%" "%BACKEND%\run.py""
+start "" cmd /k "\"%VENV_PY%\" \"%BACKEND%\run.py\""
 if errorlevel 1 (
     echo [ERROR] Failed to start backend window.
 )
 
 REM === Start frontend (project root) ===
 echo Starting frontend server...
-start "" cmd /k "cd /d "%ROOT%" && npm run dev"
+start "" cmd /k "cd /d \"%ROOT%\" && npm run dev"
 
 echo.
 echo Both servers are now running!
@@ -96,29 +101,4 @@ echo Backend: http://localhost:8000
 echo Frontend: http://localhost:5173
 echo.
 echo Note: The backend is running with "%VENV_PY%".
-goto :EOF
-
-REM === Helper: find a usable Python 3.11 ===
-:FIND_PY311
-REM Tries (in order): a python.exe with 3.11 in its path, then py launcher 3.11, else empty
-setlocal
-set "FOUND="
-for /f "tokens=* usebackq" %%P in (`where python 2^>nul ^| findstr /i "3.11.0"`) do (
-    set "FOUND=%%P"
-    goto :found
-)
-
-REM py launcher route
-where py >nul 2>&1
-if not errorlevel 1 (
-    py -3.11 --version >nul 2>&1
-    if not errorlevel 1 (
-        set "FOUND=py -3.11"
-    )
-)
-
-:found
-endlocal & (
-    if defined FOUND (set "%~1=%FOUND%") else (set "%~1=")
-)
 goto :EOF
