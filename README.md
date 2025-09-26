@@ -60,7 +60,7 @@ This is a full-stack application for analyzing business reports and documents. I
 ### Prerequisites
 
 - Node.js (v16+)
-- Python (v3.11.0)
+- Python (3.x below 3.12)
 - npm or yarn
 
 ### Installation
@@ -86,8 +86,15 @@ The start.bat script will:
 2. Create one if it doesn't exist
 3. Activate the virtual environment
 4. Install the required Python dependencies
-5. Start the backend server in the virtual environment
-6. Start the frontend development server
+5. Start the backend server in the virtual environment (http://localhost:8000)
+6. Start the frontend development server (http://localhost:5173)
+
+The script includes comprehensive error checking for:
+- Python installation and version compatibility
+- Directory access permissions
+- Virtual environment creation and activation
+- Dependency installation
+- Required files existence
 
 Or run them separately:
 
@@ -150,8 +157,9 @@ npm run dev
 - Uses SQLite as the default database (stored in `report_agent.db`)
 - File uploads are stored in a local `uploads` directory
 - Supports analysis of Excel, CSV, PDF, and text files
-- Python virtual environment (venv) is recommended but not enforced
-- No requirements pinning or dependency management beyond basic requirements.txt
+- Requires Python 3.x below 3.12 (explicitly checked by start.bat)
+- Python virtual environment (venv) is created and managed by start.bat
+- Dependencies are installed automatically from requirements.txt
 - No environment-specific configuration for development vs. production
 
 ### Frontend Environment
