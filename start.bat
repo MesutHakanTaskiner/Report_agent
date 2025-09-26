@@ -1,104 +1,30 @@
 @echo off
-setlocal enableextensions enabledelayedexpansion
-
-REM === Stable project paths ===
-set "ROOT=%~dp0"
-set "BACKEND=%ROOT%backend"
-set "VENV=%BACKEND%\venv"
-set "VENV_PY=%VENV%\Scripts\python.exe"
-set "VENV_PIP=%VENV%\Scripts\pip.exe"
-
-echo ===== Report Agent Setup and Startup =====
-echo.
-
-REM === Frontend deps (project root) ===
-echo Checking for Node.js dependencies...
-if exist "%ROOT%node_modules" (
-    echo Frontend dependencies found.
-) else (
-    echo Installing frontend dependencies...
-    pushd "%ROOT%"
-    call npm install
-    if errorlevel 1 (
-        echo [ERROR] npm install failed. Aborting.
-        popd
-        exit /b 1
-    )
-    popd
-    echo Frontend dependencies installed.
-)
-
-echo.
-
-REM === Create venv if needed ===
 echo Checking for Python virtual environment...
-if exist "%VENV_PY%" (
+cd backend
+
+IF EXIST venv (
     echo Virtual environment found.
-) else (
-    echo Creating virtual environment...
-    set "PY_CMD=python"
-    %PY_CMD% --version >nul 2>&1
-    if errorlevel 1 (
-        set "PY_CMD=py"
-        %PY_CMD% --version >nul 2>&1
-    )
-    if errorlevel 1 (
-        echo [ERROR] Could not find Python interpreter in PATH. Install Python 3 and re-run.
-        exit /b 1
-    )
-    pushd "%BACKEND%"
-    call %PY_CMD% -m venv "venv"
-    if errorlevel 1 (
-        echo [ERROR] Failed to create virtual environment. Aborting.
-        popd
-        exit /b 1
-    )
-    popd
-    echo Virtual environment created at: "%VENV%"
+) ELSE (
+    echo Creating Python virtual environment...
+    python -m venv venv
+    echo Virtual environment created.
+
+    echo Installing Python dependencies...
+    pip install -r requirements.txt
 )
 
-echo Virtual environment is ready.
-echo.
+echo Activating virtual environment...
+call venv\Scripts\activate
 
-REM === Install backend deps into the venv (no activation required) ===
-echo Installing Python dependencies...
-if not exist "%VENV_PY%" (
-    echo [ERROR] venv Python not found at "%VENV_PY%". Aborting.
-    exit /b 1
-)
-pushd "%BACKEND%"
-"%VENV_PY%" -m pip install --upgrade pip
-"%VENV_PY%" -m pip install -r requirements.txt
-if errorlevel 1 (
-    echo [WARN] requirements install reported issues; continuing to numpy/pandas pin.
-)
-
-echo Fixing numpy/pandas compatibility issue...
-"%VENV_PY%" -m pip uninstall -y numpy pandas
-"%VENV_PY%" -m pip install numpy==1.24.3
-"%VENV_PY%" -m pip install pandas==2.1.1
-if errorlevel 1 (
-    echo [ERROR] Failed to install pinned numpy/pandas. Check your requirements & wheels.
-)
-popd
-echo Fixed numpy/pandas compatibility issue.
-echo.
-
-REM === Start backend using the venv's python directly (no activation) ===
 echo Starting backend server...
-start "" cmd /k "\"%VENV_PY%\" \"%BACKEND%\run.py\""
-if errorlevel 1 (
-    echo [ERROR] Failed to start backend window.
-)
+start cmd /k "call venv\Scripts\activate && python run.py"
+cd ..
 
-REM === Start frontend (project root) ===
 echo Starting frontend server...
-start "" cmd /k "cd /d \"%ROOT%\" && npm run dev"
+start cmd /k npm run dev
 
-echo.
 echo Both servers are now running!
 echo Backend: http://localhost:8000
 echo Frontend: http://localhost:5173
 echo.
-echo Note: The backend is running with "%VENV_PY%".
-goto :EOF
+echo Note: The backend is running in a Python virtual environment.
