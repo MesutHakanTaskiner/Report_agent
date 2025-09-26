@@ -103,7 +103,7 @@ REM === Helper: find a usable Python 3.11 ===
 REM Tries (in order): a python.exe with 3.11 in its path, then py launcher 3.11, else empty
 setlocal
 set "FOUND="
-for /f "tokens=* usebackq" %%P in (`where python 2^>nul ^| findstr /i "3.11"`) do (
+for /f "tokens=* usebackq" %%P in (`where python 2^>nul ^| findstr /i "3.11.0"`) do (
     set "FOUND=%%P"
     goto :found
 )
