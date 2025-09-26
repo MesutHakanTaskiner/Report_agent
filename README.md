@@ -70,25 +70,7 @@ This is a full-stack application for analyzing business reports and documents. I
    ```
    npm install
    ```
-3. Set up Python virtual environment (recommended):
-   ```
-   cd backend
-   python -m venv venv
-   
-   # On Windows
-   venv\Scripts\activate
-   
-   # On macOS/Linux
-   source venv/bin/activate
-   ```
-4. Install backend dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-5. Return to the root directory:
-   ```
-   cd ..
-   ```
+
 
 ### Running the Application
 
