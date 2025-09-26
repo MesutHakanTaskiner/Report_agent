@@ -164,7 +164,7 @@ npm run dev
 ### Backend Environment
 - The application uses OpenAI API for generating responses
 - Requires an OpenAI API key to be set in the `.env` file (copy from `.env.example`)
-- Default model is set to `gpt-4o` with fallbacks to other models if unavailable
+- Default model is set to `gpt-4.1-mini` with fallbacks to other models if unavailable
 - Uses SQLite as the default database (stored in `report_agent.db`)
 - File uploads are stored in a local `uploads` directory
 - Supports analysis of Excel, CSV, PDF, and text files
@@ -179,40 +179,3 @@ npm run dev
 - Runs on Vite development server
 - Configured for modern browsers with ESLint for code quality
 
-## Additional Findings
-
-### Security Considerations
-- CORS is currently configured to allow all origins (`*`), which is not secure for production
-- No authentication or authorization mechanisms are implemented
-- API endpoints are not rate-limited or protected against abuse
-- File uploads should have additional validation and virus scanning
-
-### Performance Considerations
-- Large file analysis may cause timeouts or excessive token usage
-- No caching mechanisms for API responses
-- No pagination for large datasets (sessions, messages)
-- No background job processing for long-running tasks
-
-### Scalability Considerations
-- SQLite database is not suitable for high-concurrency production environments
-- No load balancing or horizontal scaling configuration
-- File storage is local, not using cloud storage services
-- No database connection pooling or optimization
-
-### Recommended Improvements
-- Implement user authentication and authorization
-- Add comprehensive logging and monitoring
-- Create Docker configuration for easier deployment
-- Add unit and integration tests
-- Implement database migrations for schema changes
-- Configure proper CORS for production
-- Add pagination for API endpoints
-- Implement caching for frequently accessed data
-- Move file storage to cloud services (S3, Azure Blob, etc.)
-- Add request validation and rate limiting
-- Improve Python environment management:
-  - Add proper dependency pinning with version constraints
-  - Include a `pyproject.toml` for modern Python packaging
-  - Create separate requirements files for development and production
-  - Add a script to automatically set up the virtual environment
-  - Document virtualenv activation in the start.bat script
