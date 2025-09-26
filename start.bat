@@ -1,4 +1,17 @@
 @echo off
+echo ===== Report Agent Setup and Startup =====
+echo.
+
+echo Checking for Node.js dependencies...
+if exist node_modules (
+    echo Frontend dependencies found.
+) else (
+    echo Installing frontend dependencies...
+    call npm install
+    echo Frontend dependencies installed.
+)
+
+echo.
 echo Checking for Python virtual environment...
 cd backend
 
@@ -9,12 +22,14 @@ IF EXIST venv (
     python -m venv venv
     echo Virtual environment created.
 
+    echo Activating virtual environment...
+    call venv\Scripts\activate
+
     echo Installing Python dependencies...
     pip install -r requirements.txt
 )
 
-echo Activating virtual environment...
-call venv\Scripts\activate
+echo Virtual environment is ready.
 
 echo Starting backend server...
 start cmd /k "call venv\Scripts\activate && python run.py"

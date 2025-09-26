@@ -63,48 +63,24 @@ This is a full-stack application for analyzing business reports and documents. I
 - Python (v3.11.0)
 - npm or yarn
 
-### Installation
-
-1. Clone the repository
-2. Install frontend dependencies:
-   ```
-   npm install
-   ```
-
-
 ### Running the Application
 
-You can run both the frontend and backend with a single command from the root directory of the project:
+Simply run the start.bat script from the root directory of the project:
 
 ```
-# Make sure you are in the root directory of the project, not in the backend folder
 start.bat
 ```
 
 The start.bat script will:
-1. Check if a Python virtual environment exists in the backend folder
-2. Create one if it doesn't exist
-3. Activate the virtual environment
-4. Install the required Python dependencies
-5. Start the backend server in the virtual environment
-6. Start the frontend development server
+1. Check if Node.js dependencies exist and install them if needed
+2. Check if a Python virtual environment exists in the backend folder
+3. Create one if it doesn't exist
+4. Activate the virtual environment
+5. Install the required Python dependencies
+6. Start the backend server in the virtual environment
+7. Start the frontend development server
 
-Or run them separately:
-
-**Backend:**
-```
-cd backend
-python -m venv venv           # Create virtual environment (first time only)
-venv\Scripts\activate         # On Windows
-source venv/bin/activate      # On macOS/Linux
-pip install -r requirements.txt
-python run.py
-```
-
-**Frontend:**
-```
-npm run dev
-```
+No manual installation steps are required - everything is handled by the start.bat script.
 
 ## API Endpoints
 
@@ -160,4 +136,3 @@ npm run dev
 - Communicates with backend via Axios HTTP client
 - Runs on Vite development server
 - Configured for modern browsers with ESLint for code quality
-
