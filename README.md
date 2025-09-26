@@ -60,7 +60,7 @@ This is a full-stack application for analyzing business reports and documents. I
 ### Prerequisites
 
 - Node.js (v16+)
-- Python (v3.8+)
+- Python (v3.11.0)
 - npm or yarn
 
 ### Installation
