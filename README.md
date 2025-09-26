@@ -85,12 +85,17 @@ This is a full-stack application for analyzing business reports and documents. I
    ```
    pip install -r requirements.txt
    ```
+5. Return to the root directory:
+   ```
+   cd ..
+   ```
 
 ### Running the Application
 
-You can run both the frontend and backend with a single command:
+You can run both the frontend and backend with a single command from the root directory of the project:
 
 ```
+# Make sure you are in the root directory of the project, not in the backend folder
 start.bat
 ```
 
